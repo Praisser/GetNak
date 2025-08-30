@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sign Up</title>
+  <!-- Link the shared CSS file -->
+  <link rel="stylesheet" href="../auth.css" />
+  <!-- Google OAuth -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <!-- Cloudflare Turnstile -->
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <!-- jwt-decode CDN for Google sign-in -->
+  <script src="https://cdn.jsdelivr.net/npm/jwt-decode@3.1.2/build/jwt-decode.min.js"></script>
+  <style>
+.spinner {
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #555;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  animation: spin 0.8s linear infinite;
+  margin: auto;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+</style>
+</head>
+<body>
+  <!-- Back Button -->
+  <button class="back-button" onclick="history.back()">Back</button>
+  
+  <div class="auth-container">
+    <!-- Logo -->
+    <!-- <div class="auth-logo">
+      <div class="placeholder-logo"></div>
+    </div> -->
+    
+    <!-- Heading -->
+    <h1>Create Your Account</h1>
+    <p class="subtext">
+      Already have an account?
+      <a href="login.html">Sign in</a>
+    </p>
+    
+    <!-- GOOGLE SIGN-UP -->
+    <div
+      id="g_id_onload"
+      data-client_id="109076471452-9f25pqiu9lges5vqpeusskd6vmshhg55.apps.googleusercontent.com"
+      data-auto_prompt="false"
+      data-callback="handleGoogleSignup"
+    ></div>
+    <div class="g_id_signin" data-type="standard"></div>
+    
+    <!-- OR Divider -->
+    <p class="or-divider">or</p>
+    
+    <!-- SIGNUP FORM -->
+    <form class="auth-form" id="signup-form">
+      <input
+        type="text"
+        id="signup-name"
+        placeholder="Full name"
+        required
+      />
+      <input
+        type="email"
+        id="signup-email"
+        placeholder="Email"
+        required
+      />
+      <input
+        type="password"
+        id="signup-password"
+        placeholder="Password (min. 8 characters)"
+        minlength="8"
+        required
+      />
+      <input
+        type="password"
+        id="signup-confirm-password"
+        placeholder="Confirm password"
+        minlength="8"
+        required
+      />
+      
+      <!-- Password strength indicator -->
+      <div class="password-strength">
+        <div class="strength-meter" id="strength-meter"></div>
+        <span id="strength-text">Password strength</span>
+      </div>
+      
+      <!-- Cloudflare Turnstile -->
+      <div class="cf-turnstile" data-sitekey="YOUR_TURNSTILE_SITE_KEY"></div>
+      
+      <select id="signup-role" required>
+        <option value="">Select role</option>
+        <option value="customer">Customer</option>
+        <option value="provider">Provider</option>
+      </select>
+      
+      <button type="submit" class="primary-btn" id="signup-button">Create account</button>
+    </form>
+    
+    <!-- Legal Text -->
+    <p class="legal-text">
+      By signing up, you confirm that you agree to our
+      <a href="#" target="_blank">Terms of Service</a> and
+      <a href="#" target="_blank">Privacy Policy</a>.
+    </p>
+  </div>
+  
+  <!-- Footer -->
+  <footer>
+    <p>&copy; 2025 Learning Platform. All rights reserved.</p>
+  </footer>
+  
+  <script>
+    // Password strength checker
+    document.getElementById('signup-password').addEventListener('input', function(e) {
+      const password = e.target.value;
+      const meter = document.getElementById('strength-meter');
+      const text = document.getElementById('strength-text');
+      
+      // Calculate strength
+      const hasLetters = /[a-zA-Z]/.test(password);
+      const hasNumbers = /\d/.test(password);
+      const hasSpecial = /[^a-zA-Z0-9]/.test(password);
+      const isLongEnough = password.length >= 8;
+      
+      let strength = 0;
+      if (hasLetters) strength += 1;
+      if (hasNumbers) strength += 1;
+      if (hasSpecial) strength += 1;
+      if (isLongEnough) strength += 1;
+      
+      // Update UI
+      meter.className = 'strength-meter';
+      if (strength === 0) {
+        meter.classList.add('empty');
+        text.textContent = 'Password strength';
+      } else if (strength <= 2) {
+        meter.classList.add('weak');
+        text.textContent = 'Weak password';
+      } else if (strength === 3) {
+        meter.classList.add('medium');
+        text.textContent = 'Medium strength';
+      } else {
+        meter.classList.add('strong');
+        text.textContent = 'Strong password';
+      }
+    });
+    
+    // Google Sign-up handler
+    async function handleGoogleSignup(response) {
+      const googleSignupButton = document.querySelector('.g_id_signin');
+      const originalButtonHTML = googleSignupButton.innerHTML;
+      
+      try {
+        const token = response.credential;
+
+        // Show loading spinner
+        googleSignupButton.innerHTML = '<div class="spinner"></div>';
+
+        const res = await fetch('http://localhost:5001/api/users/google-login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token: token })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          googleSignupButton.innerHTML = originalButtonHTML;
+          if (res.status === 409) {
+            alert("This Google account is already registered. Please sign in instead.");
+            window.location.href = "login.html";
+            return;
+          }
+          alert(data.message || "Signup failed. Please try again.");
+          return;
+        }
+
+        // Clear old user data
+        localStorage.removeItem('user');
+        localStorage.removeItem('name');
+        localStorage.removeItem('email');
+
+        // Save new user data
+        localStorage.setItem('user', JSON.stringify({
+          name: data.name,
+          email: data.email
+        }));
+
+        // Save JWT token
+        localStorage.setItem('token', data.token);
+
+        alert("Google signup successful!");
+        window.location.href = "../../home/homelogin.html";
+      } catch (err) {
+        console.error("Error during Google signup:", err);
+        googleSignupButton.innerHTML = originalButtonHTML;
+        alert("Google signup failed. Please try again or use email signup.");
+      }
+    }
+    
+    // Email Signup handler
+    document.getElementById("signup-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      
+      const signupButton = document.getElementById('signup-button');
+      signupButton.disabled = true;
+      signupButton.textContent = 'Creating account...';
+      
+      const name = document.getElementById("signup-name").value;
+      const email = document.getElementById("signup-email").value;
+      const password = document.getElementById("signup-password").value;
+      const confirm = document.getElementById("signup-confirm-password").value;
+      const role = document.getElementById("signup-role").value;
+      
+      // Basic validation
+      if (password !== confirm) {
+        alert("Passwords do not match.");
+        signupButton.disabled = false;
+        signupButton.textContent = 'Create account';
+        return;
+      }
+      
+      try {
+        const res = await fetch('http://localhost:5001/api/users/signup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, email, password, role })
+        });
+        
+        const raw = await res.text(); // Get raw response text
+        console.log("Raw response from server:", raw); // Check what server sent
+
+        let data;
+        try {
+          data = JSON.parse(raw); // Try parsing manually
+        } catch (parseError) {
+          console.error("Not JSON:", parseError);
+          throw new Error("Invalid server response");
+        }
+        
+        if (res.ok) {
+          localStorage.setItem('token', data.token); // Save JWT
+          alert("Account created successfully!");
+          window.location.href = "/frontend2/1.previous/home/homelogin.html"; // Redirect to login page
+        } else {
+          console.error("Signup failed:", data);
+          if (res.status === 409) {
+            alert("This email is already registered. Please sign in instead.");
+          } else if (data && data.message) {
+            alert(data.message);
+          } else {
+            alert("Signup failed. Please try again.");
+          }
+          signupButton.disabled = false;
+          signupButton.textContent = 'Create account';
+        }
+      } catch (err) {
+        console.error("Signup error:", err);
+        alert("Network error. Please check your connection and try again.");
+        signupButton.disabled = false;
+        signupButton.textContent = 'Create account';
+      }
+    });
+  </script>
+</body>
+</html>

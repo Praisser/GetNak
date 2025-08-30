@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+    <div class="overlay" id="overlay"></div>
+    <div class="sidebar-menu" id="sidebar-menu">
+        <button class="close-menu" id="close-menu">×</button>
+        <ul class="sidebar-nav">
+            <li><a href="../home/home.html">Home</a></li>
+            <li><a href="../upload/upload.html">Upload</a></li>
+            <li><a href="../poll/poll.html">Community</a></li>
+            <li><a href="../services/services.html">Services</a></li>
+
+
+
+        </ul>
+        <div class="sidebar-profile">
+            <img src="../default-profile.jpg" alt="Profile">
+            <div class="sidebar-profile-info">
+                <h4>User</h4>
+                <p>Member</p>
+            </div>
+        </div>
+    </div>
+
+    <header class="header container">
+        <div class="logo">
+            <h1>TaskBridge</h1>
+        </div>
+        <div class="header-right">
+            <button class="menu-toggle" id="menu-toggle">☰</button>
+            <div class="notification-icon" id="notification-toggle">
+                <span>🔔</span>
+                <span class="notification-count" id="notification-count">0</span>
+            </div>
+            <div class="notifications-panel" id="notifications-panel">
+                <div class="notifications-header">
+                    <h3>Notifications</h3>
+                    <a class="mark-all-read" id="mark-all-read">Mark all as read</a>
+                </div>
+                <ul class="notification-list" id="notification-list">
+                    <!-- Notifications will be populated dynamically -->
+                </ul>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="profile-section">
+            <div class="profile-info">
+                <img src="../default-profile.jpg" alt="Profile Picture" class="profile-pic">
+                <div class="user-details">
+                    <h2>User</h2>
+                    <p>Member</p>
+                </div>
+            </div>
+            <div class="profile-stats">
+                <div class="stat-item">
+                    <h3>Average Rating</h3>
+                    <p id="average-rating">Loading...</p>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Toggle for switching between tracking pages -->
+        <div class="tracking-toggle">
+            <button class="toggle-btn active" id="my-requests-btn">My Requests</button>
+            <button class="toggle-btn" id="helping-orders-btn">Orders I'm Helping With</button>
+        </div>
+
+        <!-- SECTION 1: Track orders you've requested -->
+        <section class="order-tracking-section" id="my-requests-section">
+            <h2>Track Your Requests</h2>
+            <div id="tracking-form" class="tracking-card">
+                <form id="order-form">
+                    <input 
+                        type="text" 
+                        id="order-number" 
+                        placeholder="Enter your order number (e.g., FY-2024-001)" 
+                        required
+                    >
+                    <button type="submit" id="track-btn">
+                        Track Order
+                    </button>
+                </form>
+            </div>
+
+            <div id="result-view" class="result-card hidden">
+                <div class="result-header">
+                    <div class="result-header-content">
+                        <div>
+                            <h2 id="result-order-number">Order #FY-2024-001</h2>
+                            <p id="result-customer-name">User</p>
+                        </div>
+                        <button id="back-btn" class="back-btn">← Back</button>
+                    </div>
+                </div>
+                
+                <div class="result-body">
+                    <div class="order-details">
+                        <div class="detail-item">
+                            <p>Status</p>
+                            <p id="order-status">Completed</p>
+                        </div>
+                        <div class="detail-item">
+                            <p>Order Date</p>
+                            <p id="order-date">2025-03-15</p>
+                        </div>
+                        <div class="detail-item">
+                            <p>Completion Date</p>
+                            <p id="est-completion">2025-03-28</p>
+                        </div>
+                    </div>
+                    
+                    <div class="amazon-tracker">
+                        <div class="completed-status">
+                            <div class="completed-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                </svg>
+                            </div>
+                            <div class="completed-text">Order Completed</div>
+                            <div class="completed-date" id="completed-date">March 28, 2025</div>
+                        </div>
+                        <div id="rating-form" class="rating-form hidden">
+                            <h3>Rate this order</h3>
+                            <div class="rating-stars">
+                                <input type="radio" name="rating" id="star5" value="5"><label for="star5">★</label>
+                                <input type="radio" name="rating" id="star4" value="4"><label for="star4">★</label>
+                                <input type="radio" name="rating" id="star3" value="3"><label for="star3">★</label>
+                                <input type="radio" name="rating" id="star2" value="2"><label for="star2">★</label>
+                                <input type="radio" name="rating" id="star1" value="1"><label for="star1">★</label>
+                            </div>
+                            <button id="submit-rating-btn" disabled>Submit Rating</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: Track orders you're helping with -->
+        <section class="order-tracking-section hidden" id="helping-orders-section">
+            <h2>Orders You're Helping With</h2>
+            <div id="helping-tracking-form" class="tracking-card">
+                <form id="helping-order-form">
+                    <input 
+                        type="text" 
+                        id="helping-order-number" 
+                        placeholder="Enter order number you're helping with" 
+                        required
+                    >
+                    <button type="submit" id="helping-track-btn">
+                        Track Order
+                    </button>
+                </form>
+            </div>
+
+            <div id="helping-result-view" class="result-card hidden">
+                <div class="result-header">
+                    <div class="result-header-content">
+                        <div>
+                            <h2 id="helping-result-order-number">Order #FY-2024-002</h2>
+                            <p id="helping-result-customer-name">Customer: User</p>
+                        </div>
+                        <button id="helping-back-btn" class="back-btn">← Back</button>
+                    </div>
+                </div>
+                
+                <div class="result-body">
+                    <div class="order-details">
+                        <div class="detail-item">
+                            <p>Status</p>
+                            <p id="helping-order-status">In Progress</p>
+                        </div>
+                        <div class="detail-item">
+                            <p>Order Date</p>
+                            <p id="helping-order-date">2025-03-25</p>
+                        </div>
+                        <div class="detail-item">
+                            <p>Expected Completion</p>
+                            <p id="helping-est-completion">2025-04-05</p>
+                        </div>
+                    </div>
+                    
+                    <div class="amazon-tracker">
+                        <div class="in-progress-status">
+                            <div class="in-progress-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                            <div class="completed-text">In Progress</div>
+                            <div class="completed-date" id="helping-deadline">Due by April 5, 2025</div>
+                            <button class="toggle-btn active" style="margin-top: 20px;" id="submit-work-btn">Submit Work</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer" style="margin-top: 120px;">
+        <p>We've just launched</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentUserId = 'user'; // Hardcoded for demo
+
+            // Initialize localStorage data if not present
+            if (!localStorage.getItem('notifications')) {
+                const initialNotifications = [
+                    {
+                        id: 1,
+                        userId: 'user',
+                        title: 'Your order FY-2024-001 is complete',
+                        time: '2025-04-17T10:00:00Z',
+                        read: false
+                    },
+                    {
+                        id: 2,
+                        userId: 'user',
+                        title: 'Platform update v2.3 is available',
+                        time: '2025-04-16T09:00:00Z',
+                        read: false
+                    },
+                    {
+                        id: 3,
+                        userId: 'user',
+                        title: 'Your community post received 42 upvotes',
+                        time: '2025-04-15T08:00:00Z',
+                        read: false
+                    },
+                    {
+                        id: 4,
+                        userId: 'user',
+                        title: 'Welcome to Dashboard!',
+                        time: '2025-04-10T07:00:00Z',
+                        read: true
+                    }
+                ];
+                localStorage.setItem('notifications', JSON.stringify(initialNotifications));
+            }
+
+            if (!localStorage.getItem('orders')) {
+                const initialOrders = [
+                    {
+                        orderNumber: 'FY-2024-001',
+                        customerId: 'user',
+                        helperId: 'john_doe',
+                        status: 'Completed',
+                        created: '2025-03-15',
+                        completed: '2025-03-28',
+                        ratings: []
+                    },
+                    {
+                        orderNumber: 'FY-2024-003',
+                        customerId: 'user',
+                        helperId: 'jane_smith',
+                        status: 'In Progress',
+                        created: '2025-04-01',
+                        completed: null,
+                        expectedCompletion: '2025-04-20',
+                        ratings: []
+                    },
+                    {
+                        orderNumber: 'FY-2024-002',
+                        customerId: 'john_doe',
+                        helperId: 'user',
+                        status: 'In Progress',
+                        created: '2025-03-25',
+                        completed: null,
+                        expectedCompletion: '2025-04-05',
+                        ratings: []
+                    },
+                    {
+                        orderNumber: 'FY-2024-004',
+                        customerId: 'jane_smith',
+                        helperId: 'user',
+                        status: 'In Progress',
+                        created: '2025-04-02',
+                        completed: null,
+                        expectedCompletion: '2025-04-15',
+                        ratings: []
+                    }
+                ];
+                localStorage.setItem('orders', JSON.stringify(initialOrders));
+            }
+
+            // Helper functions
+            function fetchData(key) {
+                return JSON.parse(localStorage.getItem(key) || '[]');
+            }
+
+            function saveData(key, data) {
+                localStorage.setItem(key, JSON.stringify(data));
+            }
+
+            function calculateAverageRating(userId) {
+                const orders = fetchData('orders').filter(o => o.helperId === userId && o.ratings.length > 0);
+                const allRatings = orders.flatMap(o => o.ratings);
+                return allRatings.length ? (allRatings.reduce((acc, r) => acc + r.score, 0) / allRatings.length).toFixed(1) : 0;
+            }
+
+            // Hamburger menu functionality
+            const menuToggle = document.getElementById('menu-toggle');
+            const sidebarMenu = document.getElementById('sidebar-menu');
+            const closeMenu = document.getElementById('close-menu');
+            const overlay = document.getElementById('overlay');
+
+            menuToggle.addEventListener('click', () => {
+                sidebarMenu.classList.add('active');
+                overlay.style.display = 'block';
+                document.body.style.overflow = 'hidden';
+            });
+
+            function closeMenuHandler() {
+                sidebarMenu.classList.remove('active');
+                overlay.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+
+            closeMenu.addEventListener('click', closeMenuHandler);
+            overlay.addEventListener('click', closeMenuHandler);
+
+            // Notifications functionality
+            const notificationToggle = document.getElementById('notification-toggle');
+            const notificationsPanel = document.getElementById('notifications-panel');
+            const markAllRead = document.getElementById('mark-all-read');
+            const notificationList = document.getElementById('notification-list');
+            const notificationCount = document.getElementById('notification-count');
+
+            let isPanelOpen = false;
+
+            function fetchNotifications() {
+                return fetchData('notifications').filter(n => n.userId === currentUserId);
+            }
+
+            function renderNotifications(notifications) {
+                notificationList.innerHTML = '';
+                const unreadCount = notifications.filter(n => !n.read).length;
+                notificationCount.textContent = unreadCount;
+                notificationCount.style.display = unreadCount > 0 ? 'flex' : 'none';
+
+                if (notifications.length === 0) {
+                    notificationList.innerHTML = '<li class="empty-notifications">No notifications</li>';
+                    return;
+                }
+
+                notifications.forEach(notification => {
+                    const li = document.createElement('li');
+                    li.className = `notification-item ${notification.read ? '' : 'unread'}`;
+                    li.dataset.id = notification.id;
+                    li.innerHTML = `
+                        <div class="notification-content">
+                            <div class="notification-title">${notification.title}</div>
+                            <div class="notification-time">${new Date(notification.time).toLocaleString()}</div>
+                        </div>
+                    `;
+                    li.addEventListener('click', () => {
+                        if (!notification.read) {
+                            markNotificationRead(notification.id);
+                            li.classList.remove('unread');
+                            updateNotificationCount();
+                        }
+                    });
+                    notificationList.appendChild(li);
+                });
+            }
+
+            function markNotificationRead(id) {
+                let notifications = fetchData('notifications');
+                notifications = notifications.map(n => n.id === id ? { ...n, read: true } : n);
+                saveData('notifications', notifications);
+                renderNotifications(fetchNotifications());
+            }
+
+            function markAllNotificationsRead() {
+                let notifications = fetchData('notifications');
+                notifications = notifications.map(n => n.userId === currentUserId ? { ...n, read: true } : n);
+                saveData('notifications', notifications);
+                renderNotifications(fetchNotifications());
+            }
+
+            function updateNotificationCount() {
+                const unreadCount = fetchNotifications().filter(n => !n.read).length;
+                notificationCount.textContent = unreadCount;
+                notificationCount.style.display = unreadCount > 0 ? 'flex' : 'none';
+            }
+
+            notificationToggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                isPanelOpen = !isPanelOpen;
+                notificationsPanel.style.display = isPanelOpen ? 'block' : 'none';
+                if (isPanelOpen) renderNotifications(fetchNotifications());
+            });
+
+            document.addEventListener('click', (e) => {
+                if (isPanelOpen && !notificationsPanel.contains(e.target) && e.target !== notificationToggle) {
+                    notificationsPanel.style.display = 'none';
+                    isPanelOpen = false;
+                }
+            });
+
+            markAllRead.addEventListener('click', markAllNotificationsRead);
+
+            // Display average rating
+            function displayAverageRating() {
+                const averageRating = calculateAverageRating(currentUserId);
+                document.getElementById('average-rating').textContent = averageRating > 0 ? `${averageRating}/5` : 'No ratings yet';
+            }
+            displayAverageRating();
+
+            // Order tracking functionality
+            const orderForm = document.getElementById('order-form');
+            const trackingForm = document.getElementById('tracking-form');
+            const resultView = document.getElementById('result-view');
+            const backBtn = document.getElementById('back-btn');
+            const orderNumberInput = document.getElementById('order-number');
+            const ratingForm = document.getElementById('rating-form');
+            const submitRatingBtn = document.getElementById('submit-rating-btn');
+
+            function trackOrder(e) {
+                e.preventDefault();
+                const orderNumber = orderNumberInput.value.trim();
+                const orders = fetchData('orders');
+                const order = orders.find(o => o.orderNumber === orderNumber && o.customerId === currentUserId);
+
+                if (order) {
+                    displayOrderData(order);
+                    trackingForm.classList.add('hidden');
+                    resultView.classList.remove('hidden');
+                    if (order.status === 'Completed' && order.ratings.length === 0) {
+                        ratingForm.classList.remove('hidden');
+                    } else {
+                        ratingForm.classList.add('hidden');
+                    }
+                } else {
+                    alert('Order not found or you are not the customer');
+                }
+            }
+
+            function resetTracking() {
+                trackingForm.classList.remove('hidden');
+                resultView.classList.add('hidden');
+                ratingForm.classList.add('hidden');
+                orderNumberInput.value = '';
+            }
+
+            function displayOrderData(data) {
+                document.getElementById('result-order-number').textContent = `Order #${data.orderNumber}`;
+                document.getElementById('result-customer-name').textContent = data.customerId;
+                document.getElementById('order-status').textContent = data.status;
+                document.getElementById('order-date').textContent = data.created;
+                document.getElementById('est-completion').textContent = data.completed || data.expectedCompletion || 'N/A';
+
+                const completedDate = data.completed || data.expectedCompletion;
+                document.getElementById('completed-date').textContent = completedDate
+                    ? new Date(completedDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+                    : 'N/A';
+            }
+
+            orderForm.addEventListener('submit', trackOrder);
+            backBtn.addEventListener('click', resetTracking);
+
+            // Rating functionality
+            const ratingInputs = document.querySelectorAll('.rating-stars input');
+            ratingInputs.forEach(input => {
+                input.addEventListener('change', () => {
+                    submitRatingBtn.disabled = false;
+                });
+            });
+
+            submitRatingBtn.addEventListener('click', () => {
+                const rating = document.querySelector('.rating-stars input:checked')?.value;
+                if (!rating) return;
+
+                const orderNumber = orderNumberInput.value.trim();
+                let orders = fetchData('orders');
+                const orderIndex = orders.findIndex(o => o.orderNumber === orderNumber);
+
+                if (orderIndex !== -1 && orders[orderIndex].customerId === currentUserId && orders[orderIndex].status === 'Completed' && orders[orderIndex].ratings.length === 0) {
+                    orders[orderIndex].ratings.push({ userId: currentUserId, score: parseInt(rating), timestamp: new Date().toISOString() });
+                    saveData('orders', orders);
+
+                    // Create notification for helper
+                    let notifications = fetchData('notifications');
+                    notifications.push({
+                        id: notifications.length + 1,
+                        userId: orders[orderIndex].helperId,
+                        title: `Your work on order ${orderNumber} was rated ${rating}/5`,
+                        time: new Date().toISOString(),
+                        read: false
+                    });
+                    saveData('notifications', notifications);
+
+                    alert('Rating submitted successfully');
+                    ratingForm.classList.add('hidden');
+                    displayAverageRating();
+                    renderNotifications(fetchNotifications());
+                } else {
+                    alert('Cannot submit rating');
+                }
+            });
+
+            // Toggle between tracking sections
+            const myRequestsBtn = document.getElementById('my-requests-btn');
+            const helpingOrdersBtn = document.getElementById('helping-orders-btn');
+            const myRequestsSection = document.getElementById('my-requests-section');
+            const helpingOrdersSection = document.getElementById('helping-orders-section');
+
+            myRequestsBtn.addEventListener('click', () => {
+                myRequestsSection.classList.remove('hidden');
+                helpingOrdersSection.classList.add('hidden');
+                myRequestsBtn.classList.add('active');
+                helpingOrdersBtn.classList.remove('active');
+            });
+
+            helpingOrdersBtn.addEventListener('click', () => {
+                helpingOrdersSection.classList.remove('hidden');
+                myRequestsSection.classList.add('hidden');
+                helpingOrdersBtn.classList.add('active');
+                myRequestsBtn.classList.remove('active');
+            });
+
+            // Helping orders tracking functionality
+            const helpingOrderForm = document.getElementById('helping-order-form');
+            const helpingResultView = document.getElementById('helping-result-view');
+            const helpingBackBtn = document.getElementById('helping-back-btn');
+            const helpingOrderNumberInput = document.getElementById('helping-order-number');
+            const submitWorkBtn = document.getElementById('submit-work-btn');
+
+            function trackHelpingOrder(e) {
+                e.preventDefault();
+                const orderNumber = helpingOrderNumberInput.value.trim();
+                const orders = fetchData('orders');
+                const order = orders.find(o => o.orderNumber === orderNumber && o.helperId === currentUserId);
+
+                if (order) {
+                    displayHelpingOrderData(order);
+                    helpingOrderForm.classList.add('hidden');
+                    helpingResultView.classList.remove('hidden');
+                    submitWorkBtn.style.display = order.status === 'In Progress' ? 'block' : 'none';
+                } else {
+                    alert('Order not found or you are not the helper');
+                }
+            }
+
+            function resetHelpingTracking() {
+                helpingOrderForm.classList.remove('hidden');
+                helpingResultView.classList.add('hidden');
+                helpingOrderNumberInput.value = '';
+            }
+
+            function displayHelpingOrderData(data) {
+                document.getElementById('helping-result-order-number').textContent = `Order #${data.orderNumber}`;
+                document.getElementById('helping-result-customer-name').textContent = `Customer: ${data.customerId}`;
+                document.getElementById('helping-order-status').textContent = data.status;
+                document.getElementById('helping-order-date').textContent = data.created;
+                document.getElementById('helping-est-completion').textContent = data.expectedCompletion || data.completed || 'N/A';
+
+                const deadline = data.expectedCompletion || data.completed;
+                document.getElementById('helping-deadline').textContent = deadline
+                    ? `Due by ${new Date(deadline).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}`
+                    : 'N/A';
+            }
+
+            helpingOrderForm.addEventListener('submit', trackHelpingOrder);
+            helpingBackBtn.addEventListener('click', resetHelpingTracking);
+
+            // Submit work
+            submitWorkBtn.addEventListener('click', () => {
+                const orderNumber = helpingOrderNumberInput.value.trim();
+                let orders = fetchData('orders');
+                const orderIndex = orders.findIndex(o => o.orderNumber === orderNumber);
+
+                if (orderIndex !== -1 && orders[orderIndex].helperId === currentUserId && orders[orderIndex].status === 'In Progress') {
+                    orders[orderIndex].status = 'Completed';
+                    orders[orderIndex].completed = new Date().toISOString().split('T')[0];
+                    saveData('orders', orders);
+
+                    // Create notification for customer
+                    let notifications = fetchData('notifications');
+                    notifications.push({
+                        id: notifications.length + 1,
+                        userId: orders[orderIndex].customerId,
+                        title: `Your order ${orderNumber} is complete`,
+                        time: new Date().toISOString(),
+                        read: false
+                    });
+                    saveData('notifications', notifications);
+
+                    alert('Work submitted successfully');
+                    resetHelpingTracking();
+                    renderNotifications(fetchNotifications());
+                } else {
+                    alert('Cannot submit work');
+                }
+            });
+        });
+    </script>
+    <script>
+        // Fetch orders for the logged-in user
+        fetch('/GetMyOrderAPI')
+          .then(res => res.json())
+          .then(data => console.log('My Orders:', data));
+      
+        // Fetch notifications
+        fetch('/NotificationAPI')
+          .then(res => res.json())
+          .then(data => console.log('Notifications:', data));
+      </script>
+      
+</body>
+</html>
